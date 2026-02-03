@@ -1,12 +1,17 @@
 
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Auth from './pages/Auth';
+import './App.css';
 
 function App() {
- 
   return (
-    <>
-     <p className="bg-red-300">Hello world</p>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/" element={<Navigate to="/auth" replace />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
