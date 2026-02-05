@@ -48,7 +48,7 @@ expenseRouter.post("/expenses", async (req, res) => {
         participants: {
           connect: participantIds.map(id => ({ id }))
         },
-        date: new Date(date)
+        date: date
       },
       include: {
         paidBy: true,
