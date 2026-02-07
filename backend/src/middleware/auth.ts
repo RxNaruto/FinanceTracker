@@ -1,20 +1,25 @@
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config.js";
 
-export const authMiddleware = (req: any, res: any, next: any) => {
+export const userAuth = (req: any, res: any, next: any) => {
   const authHeader = req.headers.authorization;
 
+  // Expect: Authorization: Bearer <token>
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({
+      message: "You are not authorized"
+    });
   }
 
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    req.userId = decoded.userId;
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    req.userId = decoded.userId; 
     next();
-  } catch {
-    return res.status(401).json({ message: "Invalid token" });
+  } catch (error) {
+    return res.status(401).json({
+      message: "User not verified"
+    });
   }
 };
