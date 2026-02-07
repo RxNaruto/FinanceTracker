@@ -27,7 +27,7 @@ export const CollectiveSpending = () => {
     }
 
     const res = await axios.get(
-      "http://localhost:3000/e/spending/collective",
+      "http://3.111.52.170:3000/e/spending/collective",
       {
         headers: {
           Authorization: `Bearer ${token}`
