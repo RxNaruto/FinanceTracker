@@ -27,7 +27,7 @@ export const AddExpense = () => {
 
     try {
       await axios.post(
-        "http://localhost:3000/e/exp",
+        "http://3.111.52.170:3000/e/exp",
         {
           title,
           amount: Number(amount),

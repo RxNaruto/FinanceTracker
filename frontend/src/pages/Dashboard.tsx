@@ -13,7 +13,7 @@ export const Dashboard = () => {
       return;
     }
 
-    axios.get("http://localhost:3000/e/balance", {
+    axios.get("http://3.111.52.170:3000/e/balance", {
       headers: {
         Authorization: `Bearer ${token}`
       }
