@@ -119,7 +119,10 @@ expenseRouter.get("/spending/individual", userAuth, async (req: any, res) => {
       }
     });
 
-    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const total = expenses.reduce(
+  (sum: number, e: { amount: number }) => sum + e.amount,
+  0
+);
 
     res.json({
       total,
@@ -167,7 +170,11 @@ expenseRouter.get("/spending/collective", userAuth, async (req: any, res) => {
       }
     });
 
-    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const total = expenses.reduce(
+  (sum: number, e: { amount: number }) => sum + e.amount,
+  0
+);
+
 
     res.json({
       total,
