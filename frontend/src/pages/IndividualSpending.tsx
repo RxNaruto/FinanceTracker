@@ -21,7 +21,7 @@ export const IndividualSpending = () => {
     }
 
     const res = await axios.get(
-      "http://3.111.52.170:3000/e/spending/individual",
+      "https://financetracker.rithkchaudharytechnologies.xyz/e/spending/individual",
       {
         headers: { Authorization: `Bearer ${token}` },
         params

@@ -18,7 +18,7 @@ export const Signin = () => {
     try {
       const response = await axios.post(
         // "http://localhost:3000/t/login",
-        "http://3.111.52.170:3000/t/login",
+        "https://financetracker.rithkchaudharytechnologies.xyz/t/login",
         {
           email,
           password

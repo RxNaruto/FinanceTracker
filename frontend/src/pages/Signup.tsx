@@ -18,7 +18,7 @@ export const Signup = () => {
 
     try {
       const response = await axios.post(
-        "http://3.111.52.170:3000/t/signup",
+        "https://financetracker.rithkchaudharytechnologies.xyz/t/signup",
         {
           name,
           email,

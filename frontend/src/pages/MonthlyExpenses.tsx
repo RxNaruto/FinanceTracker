@@ -10,7 +10,7 @@ export const MonthlyExpenses = () => {
   useEffect(() => {
     const date = new Date();
     axios.get(
-      `http://3.111.52.170:3000/expenses/month?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
+      `https://financetracker.rithkchaudharytechnologies.xyz/e/expenses/month?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
