@@ -3,6 +3,7 @@ import axios from "axios";
 import { InputBox } from "../components/InputBox";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export const AddExpense = () => {
   const [title, setTitle] = useState("");
@@ -46,9 +47,12 @@ export const AddExpense = () => {
           }
         }
       );
-
-      navigate("/home");
+      toast.success("Expense added");
+      setTimeout(()=>{
+        navigate("/home");
+      },1000)
     } catch (err: any) {
+      toast.error("Failed to add expense");
       alert(err.response?.data?.message || "Failed to add expense");
     } finally {
       setLoading(false);
