@@ -5,7 +5,7 @@ import { userAuth } from "../middleware/auth.js";
 const expenseRouter = Router();
 const prisma = new PrismaClient();
 
-expenseRouter.post("/exp", userAuth, async (req: any, res) => {
+expenseRouter.post("/exp", userAuth,expenseRouter, async (req: any, res) => {
   const body = req.body;
   const myId = req.userId;          
   const friendId = myId === 3 ? 4 : 3;

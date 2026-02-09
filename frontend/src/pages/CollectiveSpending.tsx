@@ -28,6 +28,7 @@ export const CollectiveSpending = () => {
 
     const res = await axios.get(
       "https://financetracker.rithkchaudharytechnologies.xyz/e/spending/collective",
+      // "http://localhost:3000/e/spending/collective",
       {
         headers: {
           Authorization: `Bearer ${token}`

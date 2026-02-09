@@ -10,9 +10,13 @@ export const AddExpense = () => {
   const [splitType, setSplitType] =
     useState<"INDIVIDUAL" | "BOTH">("INDIVIDUAL");
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleAddExpense = async () => {
+    if (loading) return;
+
     if (!title || !amount) {
       alert("Please fill all fields");
       return;
@@ -25,8 +29,11 @@ export const AddExpense = () => {
       return;
     }
 
+    setLoading(true);
+
     try {
       await axios.post(
+        // "https://localhost:3000/e/exp",
         "https://financetracker.rithkchaudharytechnologies.xyz/e/exp",
         {
           title,
@@ -43,6 +50,8 @@ export const AddExpense = () => {
       navigate("/home");
     } catch (err: any) {
       alert(err.response?.data?.message || "Failed to add expense");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,14 +61,14 @@ export const AddExpense = () => {
         <div className="mb-6">
           <button
             onClick={() => navigate("/home")}
-            className="text-blue-600 hover:text-blue-700 font-medium flex items-center"
+            className="text-blue-600 hover:text-blue-700 font-medium"
           >
             ← Back to Dashboard
           </button>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Add Expense</h2>
+          <h2 className="text-3xl font-bold mb-6">Add Expense</h2>
 
           <div className="space-y-6">
             <InputBox
@@ -75,16 +84,18 @@ export const AddExpense = () => {
             />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium mb-3">
                 Split Type
               </label>
+
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setSplitType("INDIVIDUAL")}
-                  className={`py-4 px-6 rounded-lg font-medium transition-all ${
+                  disabled={loading}
+                  className={`py-3 px-4 rounded-lg ${
                     splitType === "INDIVIDUAL"
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100"
                   }`}
                 >
                   Individual
@@ -92,10 +103,11 @@ export const AddExpense = () => {
 
                 <button
                   onClick={() => setSplitType("BOTH")}
-                  className={`py-4 px-6 rounded-lg font-medium transition-all ${
+                  disabled={loading}
+                  className={`py-3 px-4 rounded-lg ${
                     splitType === "BOTH"
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100"
                   }`}
                 >
                   Both
@@ -103,9 +115,10 @@ export const AddExpense = () => {
               </div>
             </div>
 
-            <div className="pt-4">
-              <Button label="Add Expense" onClick={handleAddExpense} />
-            </div>
+            <Button
+              label={loading ? "Adding..." : "Add Expense"}
+              onClick={handleAddExpense}
+            />
           </div>
         </div>
       </div>
