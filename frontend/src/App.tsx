@@ -5,7 +5,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { AddExpense } from "./pages/AddExpense";
 import { IndividualSpending } from "./pages/IndividualSpending";
 import { CollectiveSpending } from "./pages/CollectiveSpending";
-import { ProtectedRoute } from "./components/protectedRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthRedirect } from "./components/AuthRedirect";
 import { Toaster } from "react-hot-toast";
 const isMobile = window.innerWidth < 640;
