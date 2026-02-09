@@ -2,9 +2,11 @@ import { useState } from "react";
 import { InputBox } from "../components/InputBox";
 import { Button } from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import axios from "axios";
 
 export const Signin = () => {
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -24,11 +26,16 @@ export const Signin = () => {
           password
         }
       );
-
       localStorage.setItem("token", response.data.token);
-      navigate("/home");
+      toast.success("Login Successful")
+      setTimeout(() => { 
+        navigate("/home");
+        },3000)
+      
     } catch (err: any) {
+      toast.error(err.response?.data?.message || "Login failed");
       alert(err.response?.data?.message || "Login failed");
+      
     }
   };
 

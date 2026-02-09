@@ -2,6 +2,7 @@ import { useState } from "react";
 import { InputBox } from "../components/InputBox";
 import { Button } from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import axios from "axios";
 
 export const Signup = () => {
@@ -19,16 +20,18 @@ export const Signup = () => {
     try {
       const response = await axios.post(
         "https://financetracker.rithkchaudharytechnologies.xyz/t/signup",
+        //  "https://localhost:3000/t/signup",
         {
           name,
           email,
           password
         }
       );
-
+      toast.success("Signup successful");
       localStorage.setItem("token", response.data.token);
       navigate("/home");
     } catch (err: any) {
+      toast.error(err.response?.data?.message || "Signup failed");
       alert(err.response?.data?.message || "Signup failed");
     }
   };

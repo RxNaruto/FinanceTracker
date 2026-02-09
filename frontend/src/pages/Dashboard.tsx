@@ -13,7 +13,10 @@ export const Dashboard = () => {
       return;
     }
 
-    axios.get("https://financetracker.rithkchaudharytechnologies.xyz/e/balance", {
+    axios.get(
+      "https://financetracker.rithkchaudharytechnologies.xyz/e/balance",
+      // "https://localhost:3000/e/balance", 
+      {
       headers: {
         Authorization: `Bearer ${token}`
       }
