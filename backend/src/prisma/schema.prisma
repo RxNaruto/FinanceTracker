@@ -26,11 +26,12 @@ model User {
 model Expense {
   id        Int       @id @default(autoincrement())
   title     String
-  amount    Int       // store in rupees (₹)
+  amount    Int
   splitType SplitType
   paidById  Int
   paidBy    User      @relation("PaidBy", fields: [paidById], references: [id])
   participants User[] @relation("Participants")
+  isSettlement Boolean @default(false)
   date      DateTime
   createdAt DateTime  @default(now())
 }
