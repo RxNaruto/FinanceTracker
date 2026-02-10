@@ -54,35 +54,33 @@ expenseRouter.get("/balance", userAuth, async (req: any, res) => {
   try {
     const expenses = await prisma.expense.findMany({
       where: {
-        splitType: "BOTH"
-      },
-      include: {
-        participants: true
+        OR: [
+          { splitType: "BOTH" },
+          { isSettlement: true }
+        ]
       }
     });
 
     let balance = 0;
 
     for (const exp of expenses) {
-      const share = exp.amount / 2;
+      if (exp.splitType === "BOTH") {
+        const share = exp.amount / 2;
+        balance += exp.paidById === myId ? share : -share;
+      }
 
-      if (exp.paidById === myId) {
-        balance += share;   // friend owes me
-      } else {
-        balance -= share;   // I owe friend
+      if (exp.isSettlement) {
+        // If I paid settlement → I reduce what I owe
+        balance += exp.paidById === myId ? exp.amount : -exp.amount;
       }
     }
 
-    return res.status(200).json({
-      balance
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal Server error"
-    });
+    res.json({ balance });
+  } catch {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 
 expenseRouter.get("/spending/individual", userAuth, async (req: any, res) => {
   const userId = req.userId;
@@ -184,6 +182,39 @@ expenseRouter.get("/spending/collective", userAuth, async (req: any, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+expenseRouter.post("/settle", userAuth, async (req: any, res) => {
+  const { amount } = req.body;
+  const myId = req.userId;
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ message: "Invalid amount" });
+  }
+
+  try {
+    const settlement = await prisma.expense.create({
+      data: {
+        title: "Settlement Payment",
+        amount,
+        splitType: "INDIVIDUAL",
+        paidById: myId,
+        participants: {
+          connect: [{ id: myId }]
+        },
+        isSettlement: true,
+        date: new Date()
+      }
+    });
+
+    res.json({
+      message: "Settlement completed",
+      settlement
+    });
+  } catch {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 
 
 

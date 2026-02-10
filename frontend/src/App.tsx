@@ -8,6 +8,8 @@ import { CollectiveSpending } from "./pages/CollectiveSpending";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthRedirect } from "./components/AuthRedirect";
 import { Toaster } from "react-hot-toast";
+import { SettleUp } from "./pages/SettleUp";
+
 const isMobile = window.innerWidth < 640;
 function App() {
   return (
@@ -69,6 +71,11 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/settle" element={
+  <ProtectedRoute>
+    <SettleUp />
+  </ProtectedRoute>
+} />
 
         <Route
           path="/spending/collective"
@@ -78,6 +85,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
 
         <Route path="*" element={<Signin />} />
       </Routes>
