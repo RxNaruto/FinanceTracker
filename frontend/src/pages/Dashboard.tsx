@@ -15,12 +15,12 @@ export const Dashboard = () => {
 
     axios.get(
       "https://financetracker.rithkchaudharytechnologies.xyz/e/balance",
-      // "https://localhost:3000/e/balance", 
       {
-      headers: {
-        Authorization: `Bearer ${token}`
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       }
-    })
+    )
     .then(res => {
       setBalance(res.data.balance);
     })
@@ -37,37 +37,44 @@ export const Dashboard = () => {
           <p className="text-gray-600">Track your expenses and balance</p>
         </div>
 
+        {/* Balance Card */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="text-center">
             <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
               Current Balance
             </p>
+
             {balance > 0 && (
-              <div>
+              <>
                 <p className="text-5xl font-bold text-green-600 mb-2">
                   ₹{balance}
                 </p>
                 <p className="text-gray-600">You will receive</p>
-              </div>
+              </>
             )}
+
             {balance < 0 && (
-              <div>
+              <>
                 <p className="text-5xl font-bold text-red-600 mb-2">
                   ₹{Math.abs(balance)}
                 </p>
                 <p className="text-gray-600">You owe</p>
-              </div>
+              </>
             )}
+
             {balance === 0 && (
-              <div>
+              <>
                 <p className="text-5xl font-bold text-blue-600 mb-2">₹0</p>
                 <p className="text-gray-600">All settled</p>
-              </div>
+              </>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Action Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          {/* Add Expense */}
           <Link
             to="/add-expense"
             className="bg-white hover:bg-blue-50 rounded-xl shadow-md p-6 transition-all hover:shadow-lg border-2 border-transparent hover:border-blue-500"
@@ -77,10 +84,15 @@ export const Dashboard = () => {
                 <span className="text-2xl">➕</span>
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 text-center">Add Expense</h3>
-            <p className="text-gray-600 text-sm text-center mt-2">Record a new expense</p>
+            <h3 className="text-lg font-semibold text-gray-800 text-center">
+              Add Expense
+            </h3>
+            <p className="text-gray-600 text-sm text-center mt-2">
+              Record a new expense
+            </p>
           </Link>
 
+          {/* Individual Spending */}
           <Link
             to="/spending/individual"
             className="bg-white hover:bg-blue-50 rounded-xl shadow-md p-6 transition-all hover:shadow-lg border-2 border-transparent hover:border-blue-500"
@@ -90,10 +102,15 @@ export const Dashboard = () => {
                 <span className="text-2xl">👤</span>
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 text-center">Individual Spending</h3>
-            <p className="text-gray-600 text-sm text-center mt-2">View your personal expenses</p>
+            <h3 className="text-lg font-semibold text-gray-800 text-center">
+              Individual Spending
+            </h3>
+            <p className="text-gray-600 text-sm text-center mt-2">
+              View your personal expenses
+            </p>
           </Link>
 
+          {/* Collective Spending */}
           <Link
             to="/spending/collective"
             className="bg-white hover:bg-blue-50 rounded-xl shadow-md p-6 transition-all hover:shadow-lg border-2 border-transparent hover:border-blue-500"
@@ -103,9 +120,32 @@ export const Dashboard = () => {
                 <span className="text-2xl">👥</span>
               </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 text-center">Collective Spending</h3>
-            <p className="text-gray-600 text-sm text-center mt-2">View shared expenses</p>
+            <h3 className="text-lg font-semibold text-gray-800 text-center">
+              Collective Spending
+            </h3>
+            <p className="text-gray-600 text-sm text-center mt-2">
+              View shared expenses
+            </p>
           </Link>
+
+          {/* ✅ Settle Up */}
+          <Link
+            to="/settle"
+            className="bg-white hover:bg-blue-50 rounded-xl shadow-md p-6 transition-all hover:shadow-lg border-2 border-transparent hover:border-blue-500"
+          >
+            <div className="flex items-center justify-center mb-3">
+              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                <span className="text-2xl">💸</span>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 text-center">
+              Settle Up
+            </h3>
+            <p className="text-gray-600 text-sm text-center mt-2">
+              Clear pending balance
+            </p>
+          </Link>
+
         </div>
       </div>
     </div>
