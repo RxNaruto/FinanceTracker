@@ -21,6 +21,7 @@ model User {
 
   paidExpenses Expense[] @relation("PaidBy")
   expenses     Expense[] @relation("Participants")
+  budgets Budget[] 
 }
 
 model Expense {
@@ -34,4 +35,14 @@ model Expense {
   isSettlement Boolean @default(false)
   date      DateTime
   createdAt DateTime  @default(now())
+}
+model Budget {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  total      Int
+  startDate  DateTime
+  endDate    DateTime
+  dailyLimit Int
+  createdAt  DateTime @default(now())
 }

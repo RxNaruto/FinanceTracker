@@ -6,13 +6,16 @@ const expenseRouter = Router();
 const prisma = new PrismaClient();
 
 
-expenseRouter.post("/exp", userAuth,expenseRouter, async (req: any, res) => {
+expenseRouter.post("/exp", userAuth, async (req: any, res) => {
   const body = req.body;
-  const myId = req.userId;          
+  const myId = req.userId;
   const friendId = myId === 1 ? 2 : 1;
 
   let participants: number[] = [];
 
+  // =============================
+  // Split Type Handling (UNCHANGED)
+  // =============================
   if (body.splitType === "INDIVIDUAL") {
     participants = [myId];
   } else if (body.splitType === "BOTH") {
@@ -24,6 +27,9 @@ expenseRouter.post("/exp", userAuth,expenseRouter, async (req: any, res) => {
   }
 
   try {
+    // =============================
+    // CREATE EXPENSE (UNCHANGED)
+    // =============================
     const exp = await prisma.expense.create({
       data: {
         title: body.title,
@@ -37,10 +43,63 @@ expenseRouter.post("/exp", userAuth,expenseRouter, async (req: any, res) => {
       }
     });
 
+    let warning: string | null = null;
+
+    // =============================
+    // BUDGET CHECK (NEW FEATURE)
+    // Only applies to INDIVIDUAL spending
+    // =============================
+    if (body.splitType === "INDIVIDUAL") {
+
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const todayEnd = new Date();
+      todayEnd.setHours(23, 59, 59, 999);
+
+      // Find active budget
+      const activeBudget = await prisma.budget.findFirst({
+        where: {
+          userId: myId,
+          startDate: { lte: todayStart },
+          endDate: { gte: todayStart }
+        }
+      });
+
+      if (activeBudget) {
+
+        // Get today's total spending
+        const todayExpenses = await prisma.expense.findMany({
+          where: {
+            paidById: myId,
+            splitType: "INDIVIDUAL",
+            date: {
+              gte: todayStart,
+              lte: todayEnd
+            }
+          }
+        });
+
+        const todayTotal = todayExpenses.reduce(
+          (sum: number, e: { amount: number }) => sum + e.amount,
+          0
+        );
+
+        if (todayTotal > activeBudget.dailyLimit) {
+          warning = "You have exceeded today's budget limit. Slow down your spending.";
+        }
+      }
+    }
+
+    // =============================
+    // RESPONSE (UNCHANGED + WARNING)
+    // =============================
     return res.status(200).json({
       message: "Expense added",
-      expense: exp
+      expense: exp,
+      warning
     });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -211,6 +270,65 @@ expenseRouter.post("/settle", userAuth, async (req: any, res) => {
       message: "Settlement completed",
       settlement
     });
+  } catch {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+expenseRouter.post("/budget", userAuth, async (req: any, res) => {
+  const { total, startDate, endDate } = req.body;
+  const userId = req.userId;
+
+  if (!total || !startDate || !endDate) {
+    return res.status(400).json({ message: "All fields required" });
+  }
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const days =
+    Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+  if (days <= 0) {
+    return res.status(400).json({ message: "Invalid date range" });
+  }
+
+  const dailyLimit = Math.floor(total / days);
+
+  try {
+    const budget = await prisma.budget.create({
+      data: {
+        userId,
+        total,
+        startDate: start,
+        endDate: end,
+        dailyLimit
+      }
+    });
+
+    res.json({
+      message: "Budget created",
+      budget
+    });
+  } catch {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+expenseRouter.get("/budget", userAuth, async (req: any, res) => {
+  const userId = req.userId;
+  const today = new Date();
+
+  try {
+    const budget = await prisma.budget.findFirst({
+      where: {
+        userId,
+        startDate: { lte: today },
+        endDate: { gte: today }
+      }
+    });
+
+    res.json({ budget });
   } catch {
     res.status(500).json({ message: "Internal Server Error" });
   }
