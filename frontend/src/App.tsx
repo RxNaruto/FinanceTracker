@@ -9,6 +9,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthRedirect } from "./components/AuthRedirect";
 import { Toaster } from "react-hot-toast";
 import { SettleUp } from "./pages/SettleUp";
+import { Budget } from "./pages/Budget";
+
 
 const isMobile = window.innerWidth < 640;
 function App() {
@@ -85,6 +87,11 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/budget" element={
+            <ProtectedRoute>
+                <Budget />
+              </ProtectedRoute>
+            } />
 
 
           <Route path="*" element={<Signin />} />

@@ -145,6 +145,20 @@ export const Dashboard = () => {
               Clear pending balance
             </p>
           </Link>
+          <Link
+  to="/budget"
+  className="bg-white hover:bg-blue-50 rounded-xl shadow-md p-6 transition-all"
+>
+  <div className="flex items-center justify-center mb-3">
+    <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+      <span className="text-2xl">💰</span>
+    </div>
+  </div>
+  <h3 className="text-lg font-semibold text-center">Set Budget</h3>
+  <p className="text-sm text-gray-600 text-center mt-2">
+    Manage your spending limit
+  </p>
+</Link>
 
         </div>
       </div>
