@@ -19,22 +19,21 @@ export const AddExpense = () => {
     if (loading) return;
 
     if (!title || !amount) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("Please login again");
+      toast.error("Please login again");
       return;
     }
 
     setLoading(true);
 
     try {
-      await axios.post(
-        // "https://localhost:3000/e/exp",
+      const res = await axios.post(
         "https://financetracker.rithkchaudharytechnologies.xyz/e/exp",
         {
           title,
@@ -47,13 +46,21 @@ export const AddExpense = () => {
           }
         }
       );
+
+      // ✅ Success notification
       toast.success("Expense added");
-      setTimeout(()=>{
+
+      // ✅ Budget warning (NEW FEATURE)
+      if (res.data.warning) {
+        toast.error(res.data.warning);
+      }
+
+      setTimeout(() => {
         navigate("/home");
-      },1000)
+      }, 1000);
+
     } catch (err: any) {
-      toast.error("Failed to add expense");
-      alert(err.response?.data?.message || "Failed to add expense");
+      toast.error(err.response?.data?.message || "Failed to add expense");
     } finally {
       setLoading(false);
     }
