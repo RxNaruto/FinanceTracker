@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 export const CollectiveSpending = () => {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
-  const [filter, setFilter] = useState("month"); // ✅ default monthly
-  const [search, setSearch] = useState("");      // ✅ search
+  const [filter, setFilter] = useState("month"); // ✅ default month
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -30,9 +30,7 @@ export const CollectiveSpending = () => {
     const res = await axios.get(
       "https://financetracker.rithkchaudharytechnologies.xyz/e/spending/collective",
       {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
+        headers: { Authorization: `Bearer ${token}` },
         params
       }
     );
@@ -64,15 +62,9 @@ export const CollectiveSpending = () => {
 
         <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 mb-6">
 
-          <h2 className="text-3xl font-bold mb-2">
-            Collective Spending
-          </h2>
+          <h2 className="text-3xl font-bold mb-2">Collective Spending</h2>
+          <p className="text-gray-600 mb-6">Shared expenses with others</p>
 
-          <p className="text-gray-600 mb-6">
-            Shared expenses with others
-          </p>
-
-          {/* ✅ Search */}
           <input
             type="text"
             placeholder="Search by title..."
@@ -90,7 +82,19 @@ export const CollectiveSpending = () => {
             </p>
           </div>
 
+          {/* ✅ All button restored */}
           <div className="flex gap-3 mb-6">
+            <button
+              onClick={() => setFilter("all")}
+              className={`px-6 py-2 rounded-lg ${
+                filter === "all"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100"
+              }`}
+            >
+              All
+            </button>
+
             <button
               onClick={() => setFilter("today")}
               className={`px-6 py-2 rounded-lg ${
@@ -137,7 +141,7 @@ export const CollectiveSpending = () => {
                       ? "bg-blue-100 text-blue-700"
                       : "bg-purple-100 text-purple-700"
                   }`}>
-                    Paid by: {e.paidById === myUserId ? "You" : `Friend`}
+                    Paid by: {e.paidById === myUserId ? "You" : "Friend"}
                   </span>
                 </div>
               ))

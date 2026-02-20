@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 export const IndividualSpending = () => {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
-  const [filter, setFilter] = useState("month"); // ✅ default monthly
-  const [search, setSearch] = useState("");      // ✅ search state
+  const [filter, setFilter] = useState("month"); // ✅ default month
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -14,7 +14,9 @@ export const IndividualSpending = () => {
   const fetchData = async () => {
     const params: any = {};
 
-    if (filter === "today") params.type = "today";
+    if (filter === "today") {
+      params.type = "today";
+    }
 
     if (filter === "month") {
       const d = new Date();
@@ -22,6 +24,8 @@ export const IndividualSpending = () => {
       params.month = d.getMonth() + 1;
       params.year = d.getFullYear();
     }
+
+    // if filter === "all" → no params sent
 
     const res = await axios.get(
       "https://financetracker.rithkchaudharytechnologies.xyz/e/spending/individual",
@@ -39,7 +43,6 @@ export const IndividualSpending = () => {
     fetchData();
   }, [filter]);
 
-  // ✅ search filtering
   const filteredExpenses = expenses.filter(e =>
     e.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -51,7 +54,7 @@ export const IndividualSpending = () => {
         <div className="mb-6">
           <button
             onClick={() => navigate("/home")}
-            className="text-blue-600 hover:text-blue-700 font-medium flex items-center"
+            className="text-blue-600 font-medium"
           >
             ← Back to Dashboard
           </button>
@@ -59,15 +62,10 @@ export const IndividualSpending = () => {
 
         <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 mb-6">
 
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">
-            Individual Spending
-          </h2>
+          <h2 className="text-3xl font-bold mb-2">Individual Spending</h2>
+          <p className="text-gray-600 mb-6">Your personal expenses</p>
 
-          <p className="text-gray-600 mb-6">
-            Your personal expenses
-          </p>
-
-          {/* ✅ Search Bar */}
+          {/* ✅ Search */}
           <input
             type="text"
             placeholder="Search by title..."
@@ -81,13 +79,25 @@ export const IndividualSpending = () => {
             <p className="text-4xl font-bold text-blue-600">₹{total}</p>
           </div>
 
+          {/* ✅ All button restored */}
           <div className="flex flex-wrap gap-3 mb-6">
             <button
+              onClick={() => setFilter("all")}
+              className={`px-6 py-2 rounded-lg ${
+                filter === "all"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100"
+              }`}
+            >
+              All
+            </button>
+
+            <button
               onClick={() => setFilter("today")}
-              className={`px-6 py-2 rounded-lg font-medium ${
+              className={`px-6 py-2 rounded-lg ${
                 filter === "today"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700"
+                  : "bg-gray-100"
               }`}
             >
               Today
@@ -95,10 +105,10 @@ export const IndividualSpending = () => {
 
             <button
               onClick={() => setFilter("month")}
-              className={`px-6 py-2 rounded-lg font-medium ${
+              className={`px-6 py-2 rounded-lg ${
                 filter === "month"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700"
+                  : "bg-gray-100"
               }`}
             >
               This Month
@@ -112,7 +122,7 @@ export const IndividualSpending = () => {
               </div>
             ) : (
               filteredExpenses.map(e => (
-                <div key={e.id} className="bg-gray-50 rounded-lg p-4">
+                <div key={e.id} className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between">
                     <div>
                       <h3 className="font-semibold">{e.title}</h3>
