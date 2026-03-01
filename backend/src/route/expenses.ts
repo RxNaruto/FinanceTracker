@@ -9,26 +9,26 @@ const prisma = new PrismaClient();
    ADD EXPENSE
 ===================================================== */
 expenseRouter.post("/exp", userAuth, async (req: any, res) => {
-  const body = req.body;
+  const { title, amount, splitType } = req.body;
   const myId = req.userId;
   const friendId = myId === 1 ? 2 : 1;
 
   let participants: number[] = [];
 
-  if (body.splitType === "INDIVIDUAL") {
+  if (splitType === "INDIVIDUAL") {
     participants = [myId];
-  } else if (body.splitType === "BOTH") {
+  } else if (splitType === "BOTH") {
     participants = [myId, friendId];
   } else {
     return res.status(400).json({ message: "Invalid splitType" });
   }
 
   try {
-    const exp = await prisma.expense.create({
+    const expense = await prisma.expense.create({
       data: {
-        title: body.title,
-        amount: body.amount,
-        splitType: body.splitType,
+        title,
+        amount,
+        splitType,
         paidById: myId,
         participants: {
           connect: participants.map((id) => ({ id }))
@@ -36,9 +36,10 @@ expenseRouter.post("/exp", userAuth, async (req: any, res) => {
       }
     });
 
-    res.json({ message: "Expense added", expense: exp });
-  } catch {
-    res.status(500).json({ message: "Internal Server error" });
+    res.json({ message: "Expense added", expense });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -119,7 +120,126 @@ expenseRouter.get("/spending/individual", userAuth, async (req: any, res) => {
 });
 
 /* =====================================================
-   BUDGET STATUS (NEW)
+   COLLECTIVE SPENDING
+===================================================== */
+expenseRouter.get("/spending/collective", userAuth, async (req: any, res) => {
+  const { type, month, year } = req.query;
+
+  let dateFilter: any = {};
+
+  if (type === "today") {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+    dateFilter = { gte: start, lte: end };
+  }
+
+  if (type === "month" && month && year) {
+    const start = new Date(Number(year), Number(month) - 1, 1);
+    const end = new Date(Number(year), Number(month), 1);
+    dateFilter = { gte: start, lt: end };
+  }
+
+  try {
+    const expenses = await prisma.expense.findMany({
+      where: {
+        splitType: "BOTH",
+        ...(Object.keys(dateFilter).length && { date: dateFilter })
+      },
+      orderBy: { date: "desc" },
+      select: {
+        id: true,
+        title: true,
+        amount: true,
+        date: true,
+        paidById: true
+      }
+    });
+
+    const total = expenses.reduce(
+      (sum: number, e: { amount: number }) => sum + e.amount,
+      0
+    );
+
+    res.json({ total, expenses });
+  } catch {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+/* =====================================================
+   SETTLEMENT
+===================================================== */
+expenseRouter.post("/settle", userAuth, async (req: any, res) => {
+  const { amount } = req.body;
+  const myId = req.userId;
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ message: "Invalid amount" });
+  }
+
+  try {
+    const settlement = await prisma.expense.create({
+      data: {
+        title: "Settlement Payment",
+        amount,
+        splitType: "INDIVIDUAL",
+        paidById: myId,
+        isSettlement: true,
+        participants: {
+          connect: [{ id: myId }]
+        }
+      }
+    });
+
+    res.json({ message: "Settlement completed", settlement });
+  } catch {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+/* =====================================================
+   CREATE / UPDATE BUDGET
+===================================================== */
+expenseRouter.post("/budget", userAuth, async (req: any, res) => {
+  const { totalAmount, startDate, endDate } = req.body;
+  const userId = req.userId;
+
+  if (!totalAmount || !startDate || !endDate) {
+    return res.status(400).json({ message: "All fields required" });
+  }
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const days =
+    Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+  const dailyLimit = totalAmount / days;
+
+  try {
+    await prisma.budget.deleteMany({ where: { userId } });
+
+    const budget = await prisma.budget.create({
+      data: {
+        userId,
+        totalAmount,
+        startDate: start,
+        endDate: end,
+        dailyLimit
+      }
+    });
+
+    res.json({ message: "Budget created", budget });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+/* =====================================================
+   GET BUDGET STATUS (FOR TODAY)
 ===================================================== */
 expenseRouter.get("/budget/status", userAuth, async (req: any, res) => {
   const userId = req.userId;
@@ -161,7 +281,6 @@ expenseRouter.get("/budget/status", userAuth, async (req: any, res) => {
       todaySpent,
       remaining: budget.dailyLimit - todaySpent
     });
-
   } catch {
     res.status(500).json({ message: "Internal Server Error" });
   }
