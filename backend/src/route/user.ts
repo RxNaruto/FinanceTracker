@@ -4,9 +4,8 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config.js";
 import { SignupTypes,loginTypes } from "../types/user.js";
 import { hashedPassword,comparePassword } from "../types/hashing.js";
-const userRouter = Router();
+const userRouter = Router(); 
 const prisma = new PrismaClient();
-
 
 userRouter.post("/signup",async(req,res)=>{
     const body = req.body;
