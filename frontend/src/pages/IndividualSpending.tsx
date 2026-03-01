@@ -12,6 +12,14 @@ export const IndividualSpending = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  // ✅ Currency formatter (Indian format + 2 decimals)
+  const formatAmount = (value: number) => {
+    return new Intl.NumberFormat("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
   const fetchSpending = async () => {
     const params: any = {};
 
@@ -28,7 +36,7 @@ export const IndividualSpending = () => {
       "https://financetracker.rithkchaudharytechnologies.xyz/e/spending/individual",
       {
         headers: { Authorization: `Bearer ${token}` },
-        params
+        params,
       }
     );
 
@@ -41,7 +49,7 @@ export const IndividualSpending = () => {
       const res = await axios.get(
         "https://financetracker.rithkchaudharytechnologies.xyz/e/budget/status",
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -56,7 +64,7 @@ export const IndividualSpending = () => {
     fetchBudget();
   }, [filter]);
 
-  const filteredExpenses = expenses.filter(e =>
+  const filteredExpenses = expenses.filter((e) =>
     e.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -79,10 +87,12 @@ export const IndividualSpending = () => {
           {budget && budget.dailyLimit && (
             <div className="bg-yellow-50 rounded-xl p-6 mb-6">
               <p className="text-sm text-gray-600">Daily Limit</p>
-              <p className="text-xl font-bold">₹{budget.dailyLimit}</p>
+              <p className="text-xl font-bold">
+                ₹{formatAmount(budget.dailyLimit)}
+              </p>
 
               <p className="mt-3 text-sm">
-                Today Spent: ₹{budget.todaySpent}
+                Today Spent: ₹{formatAmount(budget.todaySpent)}
               </p>
 
               <p
@@ -92,12 +102,12 @@ export const IndividualSpending = () => {
                     : "text-green-600"
                 }`}
               >
-                Remaining: ₹{budget.remaining}
+                Remaining: ₹{formatAmount(budget.remaining)}
               </p>
             </div>
           )}
 
-          {/* Search */}
+          {/* 🔍 Search */}
           <input
             type="text"
             placeholder="Search by title..."
@@ -106,18 +116,22 @@ export const IndividualSpending = () => {
             className="w-full mb-6 p-3 border rounded-lg"
           />
 
-          {/* Total */}
+          {/* 💰 Total */}
           <div className="bg-blue-50 rounded-xl p-6 mb-6">
             <p className="text-sm text-gray-600">Total Spent</p>
-            <p className="text-4xl font-bold text-blue-600">₹{total}</p>
+            <p className="text-4xl font-bold text-blue-600">
+              ₹{formatAmount(total)}
+            </p>
           </div>
 
-          {/* Filters */}
+          {/* 🔄 Filters */}
           <div className="flex gap-3 mb-6">
             <button
               onClick={() => setFilter("all")}
               className={`px-4 py-2 rounded ${
-                filter === "all" ? "bg-blue-600 text-white" : "bg-gray-100"
+                filter === "all"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100"
               }`}
             >
               All
@@ -126,7 +140,9 @@ export const IndividualSpending = () => {
             <button
               onClick={() => setFilter("today")}
               className={`px-4 py-2 rounded ${
-                filter === "today" ? "bg-blue-600 text-white" : "bg-gray-100"
+                filter === "today"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100"
               }`}
             >
               Today
@@ -135,18 +151,20 @@ export const IndividualSpending = () => {
             <button
               onClick={() => setFilter("month")}
               className={`px-4 py-2 rounded ${
-                filter === "month" ? "bg-blue-600 text-white" : "bg-gray-100"
+                filter === "month"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100"
               }`}
             >
               This Month
             </button>
           </div>
 
-          {/* List */}
+          {/* 📋 Expense List */}
           {filteredExpenses.length === 0 ? (
             <p className="text-gray-500">No expenses found</p>
           ) : (
-            filteredExpenses.map(e => (
+            filteredExpenses.map((e) => (
               <div key={e.id} className="bg-gray-50 p-4 rounded-lg mb-3">
                 <div className="flex justify-between">
                   <div>
@@ -155,7 +173,9 @@ export const IndividualSpending = () => {
                       {new Date(e.date).toLocaleString()}
                     </p>
                   </div>
-                  <p className="font-bold">₹{e.amount}</p>
+                  <p className="font-bold">
+                    ₹{formatAmount(e.amount)}
+                  </p>
                 </div>
               </div>
             ))
