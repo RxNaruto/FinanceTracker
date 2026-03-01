@@ -29,7 +29,6 @@ expenseRouter.post("/exp", userAuth, async (req: any, res) => {
         title: body.title,
         amount: body.amount,
         splitType: body.splitType,
-        date: new Date(),
         paidById: myId,
         participants: {
           connect: participants.map((id) => ({ id }))
@@ -37,9 +36,9 @@ expenseRouter.post("/exp", userAuth, async (req: any, res) => {
       }
     });
 
-    return res.json({ message: "Expense added", expense: exp });
+    res.json({ message: "Expense added", expense: exp });
   } catch {
-    return res.status(500).json({ message: "Internal Server error" });
+    res.status(500).json({ message: "Internal Server error" });
   }
 });
 
@@ -120,133 +119,49 @@ expenseRouter.get("/spending/individual", userAuth, async (req: any, res) => {
 });
 
 /* =====================================================
-   COLLECTIVE SPENDING
+   BUDGET STATUS (NEW)
 ===================================================== */
-expenseRouter.get("/spending/collective", userAuth, async (req: any, res) => {
-  const { type, month, year } = req.query;
+expenseRouter.get("/budget/status", userAuth, async (req: any, res) => {
+  const userId = req.userId;
 
-  let dateFilter: any = {};
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
 
-  if (type === "today") {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date();
-    end.setHours(23, 59, 59, 999);
-    dateFilter = { gte: start, lte: end };
-  }
-
-  if (type === "month" && month && year) {
-    const start = new Date(Number(year), Number(month) - 1, 1);
-    const end = new Date(Number(year), Number(month), 1);
-    dateFilter = { gte: start, lt: end };
-  }
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
 
   try {
-    const expenses = await prisma.expense.findMany({
+    const budget = await prisma.budget.findFirst({
       where: {
-        splitType: "BOTH",
-        ...(Object.keys(dateFilter).length && { date: dateFilter })
-      },
-      orderBy: { date: "desc" },
-      select: {
-        id: true,
-        title: true,
-        amount: true,
-        date: true,
-        paidById: true
+        userId,
+        startDate: { lte: todayStart },
+        endDate: { gte: todayStart }
       }
     });
 
-    const total = expenses.reduce(
+    if (!budget) {
+      return res.json({ budget: null });
+    }
+
+    const expenses = await prisma.expense.findMany({
+      where: {
+        paidById: userId,
+        splitType: "INDIVIDUAL",
+        date: { gte: todayStart, lte: todayEnd }
+      }
+    });
+
+    const todaySpent = expenses.reduce(
       (sum: number, e: { amount: number }) => sum + e.amount,
       0
     );
 
-    res.json({ total, expenses });
-  } catch {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-/* =====================================================
-   SETTLEMENT
-===================================================== */
-expenseRouter.post("/settle", userAuth, async (req: any, res) => {
-  const { amount } = req.body;
-  const myId = req.userId;
-
-  if (!amount || amount <= 0) {
-    return res.status(400).json({ message: "Invalid amount" });
-  }
-
-  try {
-    const settlement = await prisma.expense.create({
-      data: {
-        title: "Settlement Payment",
-        amount,
-        splitType: "INDIVIDUAL",
-        paidById: myId,
-        isSettlement: true,
-        participants: {
-          connect: [{ id: myId }]
-        },
-        date: new Date()
-      }
+    res.json({
+      dailyLimit: budget.dailyLimit,
+      todaySpent,
+      remaining: budget.dailyLimit - todaySpent
     });
 
-    res.json({ message: "Settlement completed", settlement });
-  } catch {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-/* =====================================================
-   BUDGET (NEW SECTION)
-===================================================== */
-expenseRouter.post("/budget", userAuth, async (req: any, res) => {
-  const { totalAmount, startDate, endDate } = req.body;
-  const userId = req.userId;
-
-  if (!totalAmount || !startDate || !endDate) {
-    return res.status(400).json({ message: "All fields required" });
-  }
-
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  const days =
-    Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-
-  const dailyLimit = totalAmount / days;
-
-  try {
-    await prisma.budget.deleteMany({ where: { userId } });
-
-    const budget = await prisma.budget.create({
-      data: {
-        userId,
-        totalAmount,
-        startDate: start,
-        endDate: end,
-        dailyLimit
-      }
-    });
-
-    res.json({ message: "Budget created", budget });
-  } catch {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-expenseRouter.get("/budget", userAuth, async (req: any, res) => {
-  const userId = req.userId;
-
-  try {
-    const budget = await prisma.budget.findFirst({
-      where: { userId }
-    });
-
-    res.json({ budget });
   } catch {
     res.status(500).json({ message: "Internal Server Error" });
   }
