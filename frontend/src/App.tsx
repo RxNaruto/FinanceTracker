@@ -10,95 +10,32 @@ import { AuthRedirect } from "./components/AuthRedirect";
 import { Toaster } from "react-hot-toast";
 import { SettleUp } from "./pages/SettleUp";
 import { Budget } from "./pages/Budget";
-
+import { ThemeToggle } from "./components/ThemeToggle";
 
 const isMobile = window.innerWidth < 640;
+
 function App() {
   return (
     <>
       <Toaster
         position={isMobile ? "bottom-center" : "top-right"}
-        toastOptions={{
-          duration: 3000,
-          style: {
-            fontSize: "14px",
-            maxWidth: "90vw",
-          },
-        }}
+        toastOptions={{ duration: 3000, style: { fontSize: "14px", maxWidth: "90vw" } }}
       />
+      <ThemeToggle />
       <BrowserRouter>
         <Routes>
-
-          <Route
-            path="/signin"
-            element={
-              <AuthRedirect>
-                <Signin />
-              </AuthRedirect>
-            }
-          />
-
-          <Route
-            path="/signup"
-            element={
-              <AuthRedirect>
-                <Signup />
-              </AuthRedirect>
-            }
-          />
-
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/add-expense"
-            element={
-              <ProtectedRoute>
-                <AddExpense />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/spending/individual"
-            element={
-              <ProtectedRoute>
-                <IndividualSpending />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/settle" element={
-            <ProtectedRoute>
-              <SettleUp />
-            </ProtectedRoute>
-          } />
-
-          <Route
-            path="/spending/collective"
-            element={
-              <ProtectedRoute>
-                <CollectiveSpending />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/budget" element={
-            <ProtectedRoute>
-                <Budget />
-              </ProtectedRoute>
-            } />
-
-
+          <Route path="/signin" element={<AuthRedirect><Signin /></AuthRedirect>} />
+          <Route path="/signup" element={<AuthRedirect><Signup /></AuthRedirect>} />
+          <Route path="/home" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/add-expense" element={<ProtectedRoute><AddExpense /></ProtectedRoute>} />
+          <Route path="/spending/individual" element={<ProtectedRoute><IndividualSpending /></ProtectedRoute>} />
+          <Route path="/settle" element={<ProtectedRoute><SettleUp /></ProtectedRoute>} />
+          <Route path="/spending/collective" element={<ProtectedRoute><CollectiveSpending /></ProtectedRoute>} />
+          <Route path="/budget" element={<ProtectedRoute><Budget /></ProtectedRoute>} />
           <Route path="*" element={<Signin />} />
         </Routes>
       </BrowserRouter>
     </>
   );
 }
-
 export default App;
