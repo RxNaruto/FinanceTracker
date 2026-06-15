@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { InputBox } from "../components/InputBox";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
@@ -12,14 +12,13 @@ export const Budget = () => {
   const navigate = useNavigate();
 
   const handleCreate = async () => {
-    const token = localStorage.getItem("token");
     if (!totalAmount || !startDate || !endDate) { toast.error("Fill all fields"); return; }
     try {
-      await axios.post(
-        "https://financetracker.rithkchaudharytechnologies.xyz/e/budget",
-        { totalAmount: Number(totalAmount), startDate, endDate },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.post("/e/budget", {
+        totalAmount: Number(totalAmount),
+        startDate,
+        endDate,
+      });
       toast.success("Budget created");
       navigate("/home");
     } catch { toast.error("Failed to create budget"); }

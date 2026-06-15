@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
 export const IndividualSpending = () => {
@@ -9,7 +9,6 @@ export const IndividualSpending = () => {
   const [search, setSearch] = useState("");
   const [budget, setBudget] = useState<any>(null);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
 
   const formatAmount = (value: number) =>
     new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
@@ -23,20 +22,14 @@ export const IndividualSpending = () => {
       params.month = d.getMonth() + 1;
       params.year = d.getFullYear();
     }
-    const res = await axios.get(
-      "https://financetracker.rithkchaudharytechnologies.xyz/e/spending/individual",
-      { headers: { Authorization: `Bearer ${token}` }, params }
-    );
+    const res = await api.get("/e/spending/individual", { params });
     setExpenses(res.data.expenses);
     setTotal(res.data.total);
   };
 
   const fetchBudget = async () => {
     try {
-      const res = await axios.get(
-        "https://financetracker.rithkchaudharytechnologies.xyz/e/budget/status",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.get("/e/budget/status");
       setBudget(res.data);
     } catch { setBudget(null); }
   };

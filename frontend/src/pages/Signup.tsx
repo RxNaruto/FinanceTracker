@@ -3,7 +3,7 @@ import { InputBox } from "../components/InputBox";
 import { Button } from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import axios from "axios";
+import api from "../api/axios";
 
 export const Signup = () => {
   const [name, setName] = useState("");
@@ -14,10 +14,7 @@ export const Signup = () => {
   const handleSignup = async () => {
     if (!name || !email || !password) { alert("Please fill all fields"); return; }
     try {
-      const response = await axios.post(
-        "https://financetracker.rithkchaudharytechnologies.xyz/t/signup",
-        { name, email, password }
-      );
+      const response = await api.post("/t/signup", { name, email, password });
       toast.success("Signup successful");
       localStorage.setItem("token", response.data.token);
       navigate("/home");
