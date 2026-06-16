@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,35 +13,37 @@ enum SplitType {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  password  String
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
 
   paidExpenses Expense[] @relation("PaidBy")
   expenses     Expense[] @relation("Participants")
-  budgets Budget[] 
+  budgets      Budget[]
 }
 
 model Expense {
-  id        Int       @id @default(autoincrement())
-  title     String
-  amount    Int
-  splitType SplitType
-  paidById  Int
-  paidBy    User      @relation("PaidBy", fields: [paidById], references: [id])
+  id           Int       @id @default(autoincrement())
+  title        String
+  amount       Float
+  splitType    SplitType
+  date         DateTime  @default(now())
+  isSettlement Boolean   @default(false)
+
+  paidById Int
+  paidBy   User @relation("PaidBy", fields: [paidById], references: [id])
+
   participants User[] @relation("Participants")
-  isSettlement Boolean @default(false)
-  date      DateTime
-  createdAt DateTime  @default(now())
 }
+
 model Budget {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  total      Int
-  startDate  DateTime
-  endDate    DateTime
-  dailyLimit Int
-  createdAt  DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  totalAmount Float
+  startDate   DateTime
+  endDate     DateTime
+  dailyLimit  Float
+
+  user User @relation(fields: [userId], references: [id])
 }
