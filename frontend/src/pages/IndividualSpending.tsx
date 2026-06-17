@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 
 export const IndividualSpending = () => {
@@ -24,7 +25,7 @@ export const IndividualSpending = () => {
       params.year = d.getFullYear();
     }
     const res = await axios.get(
-      "https://financetracker.rithkchaudharytechnologies.xyz/e/spending/individual",
+      `${API_URL}/e/spending/individual`,
       { headers: { Authorization: `Bearer ${token}` }, params }
     );
     setExpenses(res.data.expenses);
@@ -34,7 +35,7 @@ export const IndividualSpending = () => {
   const fetchBudget = async () => {
     try {
       const res = await axios.get(
-        "https://financetracker.rithkchaudharytechnologies.xyz/e/budget/status",
+        `${API_URL}/e/budget/status`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setBudget(res.data);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 
 export const CollectiveSpending = () => {
@@ -21,7 +22,7 @@ export const CollectiveSpending = () => {
       params.year = d.getFullYear();
     }
     const res = await axios.get(
-      "https://financetracker.rithkchaudharytechnologies.xyz/e/spending/collective",
+      `${API_URL}/e/spending/collective`,
       { headers: { Authorization: `Bearer ${token}` }, params }
     );
     setExpenses(res.data.expenses);
