@@ -4,6 +4,7 @@ import { Button } from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { API_URL } from "../config";
 
 export const Signup = () => {
   const [name, setName] = useState("");
@@ -15,7 +16,7 @@ export const Signup = () => {
     if (!name || !email || !password) { alert("Please fill all fields"); return; }
     try {
       const response = await axios.post(
-        "https://financetracker.rithkchaudharytechnologies.xyz/t/signup",
+        `${API_URL}/t/signup`,
         { name, email, password }
       );
       toast.success("Signup successful");

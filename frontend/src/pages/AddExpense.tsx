@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 import { InputBox } from "../components/InputBox";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
@@ -20,7 +21,7 @@ export const AddExpense = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://financetracker.rithkchaudharytechnologies.xyz/e/exp",
+        `${API_URL}/e/exp`,
         { title, amount: Number(amount), splitType },
         { headers: { Authorization: `Bearer ${token}` } }
       );

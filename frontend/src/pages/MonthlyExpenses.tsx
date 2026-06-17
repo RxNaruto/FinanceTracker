@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 
 export const MonthlyExpenses = () => {
@@ -10,7 +11,7 @@ export const MonthlyExpenses = () => {
   useEffect(() => {
     const date = new Date();
     axios.get(
-      `https://financetracker.rithkchaudharytechnologies.xyz/e/expenses/month?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
+      `${API_URL}/e/expenses/month?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
       { headers: { Authorization: `Bearer ${token}` } }
     ).then(res => setExpenses(res.data.expenses));
   }, []);

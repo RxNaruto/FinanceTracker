@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config";
 
 export const Dashboard = () => {
   const [balance, setBalance] = useState<number>(0);
@@ -8,7 +9,7 @@ export const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) { alert("Please login again"); return; }
-    axios.get("https://financetracker.rithkchaudharytechnologies.xyz/e/balance", {
+    axios.get(`${API_URL}/e/balance`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => setBalance(res.data.balance))

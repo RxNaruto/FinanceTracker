@@ -4,6 +4,7 @@ import { Button } from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { API_URL } from "../config";
 
 export const Signin = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ export const Signin = () => {
     if (!email || !password) { alert("Please fill all fields"); return; }
     try {
       const response = await axios.post(
-        "https://financetracker.rithkchaudharytechnologies.xyz/t/login",
+        `${API_URL}/t/login`,
         { email, password }
       );
       localStorage.setItem("token", response.data.token);

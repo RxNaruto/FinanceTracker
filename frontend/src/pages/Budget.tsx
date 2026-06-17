@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 import { InputBox } from "../components/InputBox";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +17,7 @@ export const Budget = () => {
     if (!totalAmount || !startDate || !endDate) { toast.error("Fill all fields"); return; }
     try {
       await axios.post(
-        "https://financetracker.rithkchaudharytechnologies.xyz/e/budget",
+        `${API_URL}/e/budget`,
         { totalAmount: Number(totalAmount), startDate, endDate },
         { headers: { Authorization: `Bearer ${token}` } }
       );

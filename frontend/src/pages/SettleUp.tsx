@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 import { Button } from "../components/Button";
 import { InputBox } from "../components/InputBox";
 import toast from "react-hot-toast";
@@ -18,7 +19,7 @@ export const SettleUp = () => {
     setLoading(true);
     try {
       await axios.post(
-        "https://financetracker.rithkchaudharytechnologies.xyz/e/settle",
+        `${API_URL}/e/settle`,
         { amount: Number(amount) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
