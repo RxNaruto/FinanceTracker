@@ -92,13 +92,28 @@ export const IndividualSpending = () => {
             <p className="text-gray-500 dark:text-gray-400">No expenses found</p>
           ) : (
             filteredExpenses.map((e) => (
-              <div key={e.id} className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg mb-3">
+              <div
+                key={e.id}
+                className={`p-4 rounded-lg mb-3 ${e.isSettlement
+                    ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50"
+                    : "bg-gray-50 dark:bg-gray-700/50"
+                  }`}
+              >
                 <div className="flex justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">{e.title}</h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{e.title}</h3>
+                      {e.isSettlement && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 dark:bg-amber-800/60 dark:text-amber-200 font-medium">
+                          Settlement
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(e.date).toLocaleString()}</p>
                   </div>
-                  <p className="font-bold text-gray-900 dark:text-gray-100">₹{formatAmount(e.amount)}</p>
+                  <p className={`font-bold ${e.isSettlement ? "text-amber-700 dark:text-amber-300" : "text-gray-900 dark:text-gray-100"}`}>
+                    ₹{formatAmount(e.amount)}
+                  </p>
                 </div>
               </div>
             ))

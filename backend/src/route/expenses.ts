@@ -101,17 +101,28 @@ expenseRouter.get("/spending/individual", userAuth, async (req: any, res) => {
   try {
     const expenses = await prisma.expense.findMany({
       where: {
-        splitType: "INDIVIDUAL",
         paidById: userId,
+        OR: [
+          { splitType: "INDIVIDUAL", isSettlement: false },
+          { isSettlement: true }
+        ],
         ...(Object.keys(dateFilter).length && { date: dateFilter })
       },
-      orderBy: { date: "desc" }
+      orderBy: { date: "desc" },
+      select: {
+        id: true,
+        title: true,
+        amount: true,
+        date: true,
+        paidById: true,
+        isSettlement: true
+      }
     });
 
-    const total = expenses.reduce(
-      (sum: number, e: { amount: number }) => sum + e.amount,
-      0
-    );
+    // Settlements are listed but do not inflate "Total Spent"
+    const total = expenses
+      .filter((e) => !e.isSettlement)
+      .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
     res.json({ total, expenses });
   } catch {
@@ -144,7 +155,7 @@ expenseRouter.get("/spending/collective", userAuth, async (req: any, res) => {
   try {
     const expenses = await prisma.expense.findMany({
       where: {
-        splitType: "BOTH",
+        OR: [{ splitType: "BOTH" }, { isSettlement: true }],
         ...(Object.keys(dateFilter).length && { date: dateFilter })
       },
       orderBy: { date: "desc" },
@@ -153,14 +164,15 @@ expenseRouter.get("/spending/collective", userAuth, async (req: any, res) => {
         title: true,
         amount: true,
         date: true,
-        paidById: true
+        paidById: true,
+        isSettlement: true
       }
     });
 
-    const total = expenses.reduce(
-      (sum: number, e: { amount: number }) => sum + e.amount,
-      0
-    );
+    // Settlements appear in the list but are excluded from "Total Spent Together"
+    const total = expenses
+      .filter((e) => !e.isSettlement)
+      .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
 
     res.json({ total, expenses });
   } catch {
@@ -267,6 +279,7 @@ expenseRouter.get("/budget/status", userAuth, async (req: any, res) => {
       where: {
         paidById: userId,
         splitType: "INDIVIDUAL",
+        isSettlement: false,
         date: { gte: todayStart, lte: todayEnd }
       }
     });

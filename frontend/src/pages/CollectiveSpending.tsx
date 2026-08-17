@@ -12,6 +12,9 @@ export const CollectiveSpending = () => {
   const token = localStorage.getItem("token");
   const myUserId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
 
+  const formatAmount = (value: number) =>
+    new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+
   const fetchData = async () => {
     const params: any = {};
     if (filter === "today") params.type = "today";
@@ -47,7 +50,7 @@ export const CollectiveSpending = () => {
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8 mb-6 transition-colors">
           <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Collective Spending</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">Shared expenses with others</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">Shared expenses and settlements</p>
 
           <input type="text" placeholder="Search by title..." value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -55,7 +58,7 @@ export const CollectiveSpending = () => {
 
           <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 mb-6">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Spent Together</p>
-            <p className="text-4xl font-bold text-green-600 dark:text-green-400">₹{total}</p>
+            <p className="text-4xl font-bold text-green-600 dark:text-green-400">₹{formatAmount(total)}</p>
           </div>
 
           <div className="flex gap-3 mb-6">
@@ -74,18 +77,35 @@ export const CollectiveSpending = () => {
               </div>
             ) : (
               filteredExpenses.map(e => (
-                <div key={e.id} className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                <div
+                  key={e.id}
+                  className={`p-4 rounded-lg ${e.isSettlement
+                      ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50"
+                      : "bg-gray-50 dark:bg-gray-700/50"
+                    }`}
+                >
                   <div className="flex justify-between mb-2">
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{e.title}</h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{e.title}</h3>
+                        {e.isSettlement && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 dark:bg-amber-800/60 dark:text-amber-200 font-medium">
+                            Settlement
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(e.date).toLocaleString()}</p>
                     </div>
-                    <p className="font-bold text-gray-900 dark:text-gray-100">₹{e.amount}</p>
+                    <p className={`font-bold ${e.isSettlement ? "text-amber-700 dark:text-amber-300" : "text-gray-900 dark:text-gray-100"}`}>
+                      ₹{formatAmount(e.amount)}
+                    </p>
                   </div>
                   <span className={`text-xs px-3 py-1 rounded-full ${e.paidById === myUserId
                     ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
                     : "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300"}`}>
-                    Paid by: {e.paidById === myUserId ? "You" : "Friend"}
+                    {e.isSettlement
+                      ? `Settled by: ${e.paidById === myUserId ? "You" : "Friend"}`
+                      : `Paid by: ${e.paidById === myUserId ? "You" : "Friend"}`}
                   </span>
                 </div>
               ))
