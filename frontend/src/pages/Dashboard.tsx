@@ -6,6 +6,9 @@ import { API_URL } from "../config";
 export const Dashboard = () => {
   const [balance, setBalance] = useState<number>(0);
 
+  const formatAmount = (value: number) =>
+    new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) { alert("Please login again"); return; }
@@ -32,19 +35,19 @@ export const Dashboard = () => {
             </p>
             {balance > 0 && (
               <>
-                <p className="text-5xl font-bold text-green-600 dark:text-green-400 mb-2">₹{balance}</p>
+                <p className="text-5xl font-bold text-green-600 dark:text-green-400 mb-2">₹{formatAmount(balance)}</p>
                 <p className="text-gray-600 dark:text-gray-400">You will receive</p>
               </>
             )}
             {balance < 0 && (
               <>
-                <p className="text-5xl font-bold text-red-600 dark:text-red-400 mb-2">₹{Math.abs(balance)}</p>
+                <p className="text-5xl font-bold text-red-600 dark:text-red-400 mb-2">₹{formatAmount(Math.abs(balance))}</p>
                 <p className="text-gray-600 dark:text-gray-400">You owe</p>
               </>
             )}
             {balance === 0 && (
               <>
-                <p className="text-5xl font-bold text-blue-600 dark:text-blue-400 mb-2">₹0</p>
+                <p className="text-5xl font-bold text-blue-600 dark:text-blue-400 mb-2">₹{formatAmount(0)}</p>
                 <p className="text-gray-600 dark:text-gray-400">All settled</p>
               </>
             )}
